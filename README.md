@@ -1,13 +1,13 @@
-![GitHub repo size](https://img.shields.io/github/repo-size/felipebacelo/ApplicationVBA?style=for-the-badge)
-![GitHub language count](https://img.shields.io/github/languages/count/felipebacelo/ApplicationVBA?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/felipebacelo/ApplicationVBA?style=for-the-badge)
-![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/felipebacelo/ApplicationVBA?style=for-the-badge)
-![Bitbucket open issues](https://img.shields.io/bitbucket/issues/felipebacelo/ApplicationVBA?style=for-the-badge)
+![GitHub repo size](https://img.shields.io/github/repo-size/felipebacelo/WebScrapingVBA?style=for-the-badge)
+![GitHub language count](https://img.shields.io/github/languages/count/felipebacelo/WebScrapingVBA?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/felipebacelo/WebScrapingVBA?style=for-the-badge)
+![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/felipebacelo/WebScrapingVBA?style=for-the-badge)
+![Bitbucket open issues](https://img.shields.io/bitbucket/issues/felipebacelo/WebScrapingVBA?style=for-the-badge)
 
 # WebScrapingVBA
 Repositório com Simples Exemplos de WebScraping em VBA
 
-A aplicação foi desenvolvida a partir do modelo de cadastro físico do programa Cidade Legal, seguindo o conteúdo padrão do mesmo, a partir do conceito CRUD (Create, Read, Update, Delete), que representa em acrônimo as quatro operações básicas utilizadas em bases de dados relacionais fornecidas aos utilizadores do sistema.
+Este respositório foi desenvolvido com o objetivo de praticar alguns conceitos de WebScraping utilizando VBA.
 
 ### Desenvolvimento
 
@@ -29,57 +29,71 @@ Desenvolvido em Microsoft VBA Excel.
 
 ### Compatibilidade
 
-Esta aplicação foi desenvolvida no Excel 2019 (64 bits) e testado no Excel 2016 (64 bits). Sua compatibilidade é garantida para a versão 2016 e superiores. Sua utilização em versões anteriores pode ocasionar em não funcionamento do mesmo.
+Os exemplos deste repositório foram desenvolvidos no Excel 2019 (64 bits) e testados no Excel 2016 (64 bits). Sua compatibilidade é garantida para a versão 2016 e superiores. Sua utilização em versões anteriores pode ocasionar em não funcionamento dos mesmos.
 ***
 ### Exemplos de Códigos Utilizados
 
-Macro utilizada para conexão com banco de dados Microsoft Access SQL:
+Código utilizado para realizar WebScraping de CEP:
 ```vba
-Option Explicit
-Global BD As New ADODB.Connection
+Sub IE_CEP()
 
-Sub ABRIRCONEXAO()
+Range("B3:D3").ClearContents
 
-Dim CS As String
-Dim ARQ As String
-On Error Resume Next
+Set IE = CreateObject("internetexplorer.application")
 
-ARQ = ThisWorkbook.Path & "\" & "BD SISTEMA DE CADASTRO.accdb;"
+IE.Navigate "http://www.buscacep.correios.com.br/sistemas/buscacep/"
+IE.Visible = True
 
-CS = "Provider=Microsoft.ACE.OLEDB.12.0;" _
-& "Data Source=" & ARQ _
-& "Persist Security Info=False;"
+Do While IE.busy And IE.ReadyState <> "READYSTATE_COMPLETE"
+DoEvents
+Loop
 
-BD.Close
-BD.Open CS
+IE.Document.getElementsByTagName("input")(0).Value = Cells(3, 1).Value
+IE.Document.getElementsByClassName("btn2 float-right")(0).Click
+    
+Do While IE.busy And IE.ReadyState <> "READYSTATE_COMPLETE"
+DoEvents
+Loop
+
+Cells(3, 2) = IE.Document.getElementsByTagName("td")(0).innertext
+Cells(3, 3) = IE.Document.getElementsByTagName("td")(1).innertext
+Cells(3, 4) = IE.Document.getElementsByTagName("td")(2).innertext
+
+IE.Quit
+
+Range("A3:D3").WrapText = False
 
 End Sub
 ```
 
-Macro utilizada para edição dos registros salvos no banco de dados Microsoft Access SQL:
+Código utilizado para realizar WebScraping de CPF:
 ```vba
-Sub EDITARREGISTROS(ID As Long, TODASCOLUNAS As String, REGISTRO() As String)
+Sub IE_CPF()
 
-Dim SQL As String
-Dim COLUNA() As String
-Dim I As Integer
-Dim STRINGFINAL As String
-Dim RS As New ADODB.Recordset
+Range("B3:C3").ClearContents
 
-COLUNA = Split(TODASCOLUNAS, ",")
+Set IE = CreateObject("internetexplorer.application")
 
-For I = 1 To 81
-    STRINGFINAL = STRINGFINAL & COLUNA(I - 1) & "=" & REGISTRO(I)
-    If I < 81 Then STRINGFINAL = STRINGFINAL & ","
-Next
+IE.Navigate "http://www.situacao-cadastral.com/"
+IE.Visible = True
 
-STRINGFINAL = "SET " & STRINGFINAL
-SQL = "Update CADASTROS " & STRINGFINAL
-SQL = SQL & " WHERE ID LIKE " & ID
+Do While IE.busy And IE.ReadyState <> "READYSTATE_COMPLETE"
+DoEvents
+Loop
 
-RS.Open SQL, BD
+IE.Document.getElementById("doc").Value = Cells(3, 1).Value
+IE.Document.getElementById("consultar").Click
+    
+Do While IE.busy And IE.ReadyState <> "READYSTATE_COMPLETE"
+DoEvents
+Loop
 
-MsgBox "CADASTRO EDITADO COM SUCESSO!", vbInformation, "INFORMAÇÃO"
+Cells(3, 2) = IE.Document.getElementsByClassName("dados nome")(0).innertext
+Cells(3, 3) = IE.Document.getElementsByClassName("dados situacao")(0).innertext
+
+IE.Quit
+
+Range("A3:C3").WrapText = False
 
 End Sub
 ```
