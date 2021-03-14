@@ -5,9 +5,9 @@
 ![Bitbucket open issues](https://img.shields.io/bitbucket/issues/felipebacelo/WebScrapingVBA?style=for-the-badge)
 
 # WebScrapingVBA
-Repositório com Simples Exemplos de WebScraping em VBA
+Repositório com Simples Exemplos de WebScraping em VBA Excel
 
-Este respositório foi desenvolvido com o objetivo de praticar alguns conceitos de WebScraping utilizando VBA.
+Este respositório foi desenvolvido com o objetivo de praticar alguns conceitos de WebScraping utilizando VBA Excel.
 
 ### Desenvolvimento
 
